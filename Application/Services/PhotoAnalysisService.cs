@@ -9,23 +9,25 @@ public class PhotoAnalysisService : IPhotoAnalysisService
     private readonly IPhotoRepository _photoRepo;
     private readonly IMaterialRepository _materialRepo;
     private readonly IPromptService _promptService;
+    private readonly IDownloadService _downloadService;
 
     public PhotoAnalysisService(
         IPhotoRepository photoRepo,
         IMaterialRepository materialRepo,
-        IPromptService promptService)
+        IPromptService promptService,
+        IDownloadService downloadService)
     {
         _photoRepo = photoRepo;
         _materialRepo = materialRepo;
         _promptService = promptService;
+        _downloadService = downloadService;
     }
     
     public async Task<(Guid PhotoId, List<string> Objects)> AnalyzePhotoAsync(string imageUrl)
     {
-        //TODO: сделать загрузку изображения
-        //TODO: добавить запрос к AI с помощью изображения
+        var image = await _downloadService.DownloadImageAsync(imageUrl);
 
-        var detectedObjects = await _promptService.DetectObjectsAsync([]);
+        var detectedObjects = await _promptService.DetectObjectsAsync(image);
 
         var photo = new Photo
         {
