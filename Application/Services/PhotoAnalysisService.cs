@@ -58,6 +58,9 @@ public class PhotoAnalysisService : IPhotoAnalysisService
             throw new Exception("Photo not found");
 
         var materialsObjects = await _promptService.AnalyzeMaterialsAsync(photo.Bytes, objects);
+        var allDetectedMatNames = materialsObjects.Values.SelectMany(x => x).Distinct().ToList();
+        var existingMaterials = await _materialRepo.GetByNamesAsync(allDetectedMatNames);
+        var materialsByName = existingMaterials.ToDictionary(m => m.Name.ToLower());
 
         foreach (var detected in photo.Objects)
         {
@@ -66,17 +69,11 @@ public class PhotoAnalysisService : IPhotoAnalysisService
 
             foreach (var matName in materials)
             {
-                var material = await _materialRepo.GetByNameAsync(matName);
-
-                if (material == null)
+                if (!materialsByName.TryGetValue(matName.ToLower(), out var material))
                 {
-                    material = new Material
-                    {
-                        Id = Guid.NewGuid(),
-                        Name = matName
-                    };
-
+                    material = new Material { Id = Guid.NewGuid(), Name = matName };
                     await _materialRepo.AddAsync(material);
+                    materialsByName[matName.ToLower()] = material;
                 }
 
                 if (detected.ObjectMaterials.All(om => om.MaterialId != material.Id))

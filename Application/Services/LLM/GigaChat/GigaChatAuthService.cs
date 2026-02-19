@@ -12,11 +12,11 @@ public class GigaChatAuthService
     private readonly GigaChatOptions _options;
     
     private string? _cachedToken;
-    private DateTime _tokenExpiry = DateTime.MinValue;
-    
-    private const string AuthUrl = "https://ngw.devices.sberbank.ru:9443/api/v2/oauth";
+    private DateTime _tokenExpiryUtc = DateTime.MinValue;
     
     private readonly SemaphoreSlim _lock = new(1, 1);
+    
+    private bool IsTokenValid => _cachedToken != null && DateTime.UtcNow < _tokenExpiryUtc;
 
     public GigaChatAuthService(HttpClient http, IOptions<GigaChatOptions> options)
     {
@@ -26,18 +26,16 @@ public class GigaChatAuthService
     
     public async Task<string> GetAccessTokenAsync()
     {
-        if (_cachedToken != null && DateTime.UtcNow < _tokenExpiry)
-            return _cachedToken;
+        if (IsTokenValid) return _cachedToken;
 
         await _lock.WaitAsync();
         try
         {
-            if (_cachedToken != null && DateTime.UtcNow < _tokenExpiry)
-                return _cachedToken;
+            if (IsTokenValid) return _cachedToken;
 
             var base64 = _options.ClientSecret;
 
-            var request = new HttpRequestMessage(HttpMethod.Post, AuthUrl);
+            using var request = new HttpRequestMessage(HttpMethod.Post, _options.AuthUrl);
             request.Headers.Authorization = new AuthenticationHeaderValue("Basic", base64);
             request.Headers.Add("RqUID", Guid.NewGuid().ToString());
             request.Content = new FormUrlEncodedContent(new Dictionary<string, string>
@@ -45,7 +43,7 @@ public class GigaChatAuthService
                 { "scope", _options.Scope }
             });
 
-            var response = await _http.SendAsync(request);
+            using var response = await _http.SendAsync(request);
             var json = await response.Content.ReadAsStringAsync();
 
             if (!response.IsSuccessStatusCode)
@@ -55,7 +53,7 @@ public class GigaChatAuthService
             
             _cachedToken = tokenResponse.access_token;
             
-            _tokenExpiry = DateTime.UtcNow.AddMinutes(29);
+            _tokenExpiryUtc = DateTime.UtcNow.AddSeconds(tokenResponse.expires_in - 60);
 
             return _cachedToken;
         }
@@ -68,5 +66,6 @@ public class GigaChatAuthService
     private class TokenResponse
     {
         public string access_token { get; set; } = string.Empty;
+        public int expires_in { get; set; }
     }
 }
