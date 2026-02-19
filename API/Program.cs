@@ -11,6 +11,7 @@ public class Program
 
         builder.Services.AddInfrastructureLayer(builder.Configuration);
         builder.Services.AddApplicationLayer();
+        builder.Services.SetupOptions(builder.Configuration);
         
         builder.Services.AddControllers();
         builder.Services.AddEndpointsApiExplorer();
