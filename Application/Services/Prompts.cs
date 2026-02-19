@@ -13,7 +13,7 @@ internal static class Prompts
                                           - Не сцена
                                           - Не фон
                                           - Не освещение
-                                          - Не "room", "interior", "photo"
+                                          - Не "комната", "интерьер", "фото"
 
                                           Правила ответа:
                                           - Только существительные
@@ -25,9 +25,11 @@ internal static class Prompts
 
                                           Верни СТРОГО JSON массив строк:
 
-                                          ["object1","object2","object3"]
+                                          ["объект1","объект2","объект3"]
 
                                           Если объектов нет — верни [].
+                                          
+                                          Название объектов на русском языке.
                                           """;
 
     public static string MaterialAnalysis(IEnumerable<string> objects) => $$$"""
@@ -49,15 +51,16 @@ internal static class Prompts
                                                                              Формат ответа:
 
                                                                              {
-                                                                             "object": ["material1","material2"]
+                                                                             "объект": ["материал1","материал2"]
                                                                              }
 
                                                                              Пример:
 
                                                                              {
-                                                                             "chair": ["wood","fabric"],
-                                                                             "cup": ["ceramic"]
+                                                                             "стул": ["дерево","пластик"],
+                                                                             "кубок": ["керамика"]
                                                                              }
 
+                                                                             Название объектов и материалов на русском языке.
                                                                              """;
 }

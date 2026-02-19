@@ -22,7 +22,7 @@ public class PromptService : IPromptService
     }
 
     public async Task<Dictionary<string, List<string>>> AnalyzeMaterialsAsync(
-        byte[] image,
+        byte[] image, 
         List<string> detectedObjects)
     {
         if (detectedObjects.Count == 0)
