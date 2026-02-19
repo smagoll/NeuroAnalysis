@@ -32,6 +32,7 @@ public class PhotoAnalysisService : IPhotoAnalysisService
         var photo = new Photo
         {
             Id = Guid.NewGuid(),
+            Bytes = image,
             Url = imageUrl
         };
 
@@ -56,7 +57,7 @@ public class PhotoAnalysisService : IPhotoAnalysisService
         if (photo == null)
             throw new Exception("Photo not found");
 
-        var materialsObjects = await _promptService.AnalyzeMaterialsAsync([], objects);
+        var materialsObjects = await _promptService.AnalyzeMaterialsAsync(photo.Bytes, objects);
 
         foreach (var detected in photo.Objects)
         {

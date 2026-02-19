@@ -35,8 +35,7 @@ public class GigaChatAuthService
             if (_cachedToken != null && DateTime.UtcNow < _tokenExpiry)
                 return _cachedToken;
 
-            var credentials = $"{_options.ClientId}:{_options.ClientSecret}";
-            var base64 = Convert.ToBase64String(Encoding.UTF8.GetBytes(credentials));
+            var base64 = _options.ClientSecret;
 
             var request = new HttpRequestMessage(HttpMethod.Post, AuthUrl);
             request.Headers.Authorization = new AuthenticationHeaderValue("Basic", base64);

@@ -13,7 +13,8 @@ public static class ApplicationServiceExtensions
     {
         // Application Services
         services.AddScoped<IPhotoAnalysisService, PhotoAnalysisService>();
-        services.AddScoped<IPromptService, MockPromptService>();
+        services.AddScoped<IPromptService, PromptService>();
+        services.AddScoped<IDownloadService, DownloadService>();
         services.AddScoped<ILLMService, GigaChatService>();
         services.AddSingleton<GigaChatAuthService>();
         

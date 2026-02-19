@@ -16,12 +16,12 @@ public class PhotoRepository : IPhotoRepository
 
     public async Task AddAsync(Photo photo)
     {
-        await _context.PhotoAnalyzes.AddAsync(photo);
+        await _context.Photos.AddAsync(photo);
     }
 
     public async Task<Photo?> GetByIdAsync(Guid id)
     {
-        return await _context.PhotoAnalyzes
+        return await _context.Photos
             .Include(p => p.Objects)
             .ThenInclude(o => o.ObjectMaterials)
             .ThenInclude(om => om.Material)

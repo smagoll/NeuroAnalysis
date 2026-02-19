@@ -5,7 +5,7 @@ namespace Infrastructure.Database;
 
 public class AppDbContext(DbContextOptions opts) : DbContext(opts)
 {
-    public DbSet<Photo> PhotoAnalyzes { get; set; }
+    public DbSet<Photo> Photos { get; set; }
     public DbSet<Material> Materials { get; set; }
     public DbSet<ObjectMaterial> ObjectMaterials { get; set; }
     public DbSet<DetectedObject> DetectedObjects { get; set; }
